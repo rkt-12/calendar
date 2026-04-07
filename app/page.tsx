@@ -1,19 +1,35 @@
 "use client";
 
 import { useCalendar } from "@/hooks/useCalendar";
+import { useDateRangeSelector } from "@/hooks/useDateRangeSelector";
 import { format } from "date-fns";
+import clsx from "clsx";
 
 export default function Home() {
-  const { currentDate, calendarDays, goToNextMonth, goToPrevMonth, goToToday } =
+  const { currentDate, calendarDays, goToNextMonth, goToPrevMonth } =
     useCalendar();
+
+  const {
+    range,
+    onDayClick,
+    onDayHover,
+    onDayLeave,
+    clearRange,
+    isStart,
+    isEnd,
+    isInRange,
+    isRangeStartCap,
+    isRangeEndCap,
+    isSelecting,
+  } = useDateRangeSelector();
 
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-center gap-6 p-8"
       style={{ backgroundColor: "var(--bg)" }}
     >
-      {/* Month display */}
       <div className="calendar-card p-6 w-full max-w-md">
+        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={goToPrevMonth}
@@ -37,7 +53,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Weekday headers */}
+        {/* Weekday labels */}
         <div className="grid grid-cols-7 mb-2">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
             <div
@@ -51,29 +67,62 @@ export default function Home() {
         </div>
 
         {/* Day grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {calendarDays.map((day, i) => (
-            <div
-              key={i}
-              className={`day-cell aspect-square text-xs
-                ${!day.isCurrentMonth ? "day-cell--outside" : ""}
-                ${day.isToday ? "day-cell--today" : ""}
-                ${day.isWeekend && day.isCurrentMonth ? "day-cell--weekend" : ""}
-              `}
-            >
-              {format(day.date, "d")}
-            </div>
-          ))}
+        <div
+          className="grid grid-cols-7"
+          onMouseLeave={onDayLeave}
+        >
+          {calendarDays.map((day, i) => {
+            const start = isStart(day.date);
+            const end = isEnd(day.date);
+            const inRange = isInRange(day.date);
+            const startCap = isRangeStartCap(day.date);
+            const endCap = isRangeEndCap(day.date);
+
+            return (
+              <div
+                key={i}
+                onClick={() => day.isCurrentMonth && onDayClick(day.date)}
+                onMouseEnter={() => day.isCurrentMonth && onDayHover(day.date)}
+                className={clsx(
+                  "day-cell aspect-square text-xs",
+                  !day.isCurrentMonth && "day-cell--outside",
+                  day.isToday && "day-cell--today",
+                  day.isWeekend && day.isCurrentMonth && "day-cell--weekend",
+                  inRange && "day-cell--in-range",
+                  startCap && "day-cell--range-start-cap",
+                  endCap && "day-cell--range-end-cap",
+                  start && "day-cell--start",
+                  end && "day-cell--end"
+                )}
+              >
+                {format(day.date, "d")}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Today button */}
-        <button
-          onClick={goToToday}
-          className="mt-4 w-full py-2 rounded-lg text-sm font-medium text-white"
-          style={{ backgroundColor: "var(--accent)" }}
+        {/* Range status */}
+        <div
+          className="mt-4 pt-4 text-xs flex items-center justify-between"
+          style={{ borderTop: "1px solid var(--border)", color: "var(--text-secondary)" }}
         >
-          Today
-        </button>
+          <span>
+            {isSelecting
+              ? `From ${format(range.start!, "MMM d")} — pick end date`
+              : range.start && range.end
+              ? `${format(range.start, "MMM d")} → ${format(range.end, "MMM d, yyyy")}`
+              : "Click a date to start selecting"}
+          </span>
+          {(range.start || range.end) && (
+            <button
+              onClick={clearRange}
+              className="text-xs underline"
+              style={{ color: "var(--accent)" }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
     </main>
   );
