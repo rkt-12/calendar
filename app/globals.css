@@ -1,1 +1,197 @@
 @import "tailwindcss";
+
+/* Light Theme (default)  */
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface-2: #f2f0ec;
+  --text-primary: #1a1714;
+  --text-secondary: #7a756e;
+  --text-muted: #b5b0a8;
+  --accent: #1e6fe0;
+  --accent-light: #dbeafe;
+  --accent-dark: #1558b8;
+  --border: #e8e4de;
+  --border-light: #f0ede8;
+  --day-hover: #eef4fd;
+  --range-fill: #dbeafe;
+  --range-fill-text: #1e40af;
+  --today-ring: #1e6fe0;
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Dark Theme  */
+[data-theme="dark"] {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+  --text-primary: #f0ede8;
+  --text-secondary: #9e9890;
+  --text-muted: #4a4640;
+  --accent: #4a9eff;
+  --accent-light: #1a2d4a;
+  --accent-dark: #6db3ff;
+  --border: #2a2724;
+  --border-light: #222020;
+  --day-hover: #1a2535;
+  --range-fill: #162440;
+  --range-fill-text: #93c5fd;
+  --today-ring: #4a9eff;
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Base  */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-dm-sans), sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Calendar Card  */
+.calendar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Day Cell States  */
+.day-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  user-select: none;
+  min-height: 36px;
+}
+
+.day-cell:hover:not(.day-cell--outside):not(.day-cell--start):not(.day-cell--end) {
+  background: var(--day-hover);
+  color: var(--accent);
+}
+
+.day-cell--outside {
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.day-cell--in-range {
+  background: var(--range-fill);
+  color: var(--range-fill-text);
+  border-radius: 0;
+}
+
+.day-cell--range-start-cap {
+  border-radius: 8px 0 0 8px;
+}
+
+.day-cell--range-end-cap {
+  border-radius: 0 8px 8px 0;
+}
+
+.day-cell--start,
+.day-cell--end {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.day-cell--weekend {
+  color: var(--accent);
+}
+
+.day-cell--weekend.day-cell--outside {
+  color: var(--text-muted);
+}
+
+.day-cell--today::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--today-ring);
+}
+
+.day-cell--start.day-cell--today::after,
+.day-cell--end.day-cell--today::after {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.day-cell--holiday::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+/* Notes Textarea */
+.notes-textarea {
+  width: 100%;
+  resize: none;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: border-color 0.2s ease, background 0.3s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.notes-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.notes-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* Theme transition */
+.theme-transitioning * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+}
