@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCalendar } from "@/hooks/useCalendar";
 import { useDateRangeSelector } from "@/hooks/useDateRangeSelector";
 import { useNotes } from "@/hooks/useNotes";
+import { useTheme } from "@/hooks/useTheme";
 import CalendarHeader from "@/components/CalendarHeader";
 import CalendarGrid from "@/components/CalendarGrid";
 import HeroImagePanel from "@/components/HeroImagePanel";
@@ -13,8 +14,10 @@ import { Note } from "@/hooks/useNotes";
 import { parse } from "date-fns";
 
 export default function Home() {
+
   const [direction, setDirection] = useState(1);
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   const {
     currentDate,
@@ -59,7 +62,6 @@ export default function Home() {
     goToNextMonth();
   }
 
-  // Clicking a saved note navigates to that month
   function handleNoteClick(note: Note) {
     if (note.rangeStart) {
       const target = parse(note.rangeStart, "yyyy-MM-dd", new Date());
@@ -90,7 +92,7 @@ export default function Home() {
         className="calendar-card w-full max-w-3xl flex flex-col md:flex-row"
         style={{ minHeight: "560px" }}
       >
-        {/* ── Left: Hero Image ───────────────────────────── */}
+        {/* Image */}
         <div className="md:w-2/5 w-full" style={{ flexShrink: 0 }}>
           <div className="block md:hidden">
             <HeroImagePanel
@@ -113,18 +115,20 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── Right: Calendar + Notes ─────────────────────── */}
+        {/* Calendar + Notes */}
         <div
           className="flex-1 flex flex-col overflow-hidden"
           style={{ borderLeft: "1px solid var(--border)" }}
         >
-          {/* Header */}
+          {/* Header and theme switcher */}
           <CalendarHeader
             currentDate={currentDate}
             onPrev={handlePrev}
             onNext={handleNext}
             onToday={goToToday}
             direction={direction}
+            theme={theme}
+            onThemeToggle={toggleTheme}
           />
 
           {/* Grid */}
@@ -142,7 +146,7 @@ export default function Home() {
             onDayLeave={onDayLeave}
           />
 
-          {/* Notes panel */}
+          {/* Notes */}
           <div style={{ borderTop: "1px solid var(--border)" }}>
             <NotesPanel
               currentDate={currentDate}
@@ -156,7 +160,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Saved notes list */}
+          {/* Saved notes */}
           <NotesList
             notes={allNotes}
             onDelete={deleteNote}

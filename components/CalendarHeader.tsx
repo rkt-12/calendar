@@ -3,13 +3,17 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import ThemeSwitcher from "./ThemeSwitcher";
+import { Theme } from "@/hooks/useTheme";
 
 interface CalendarHeaderProps {
   currentDate: Date;
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
-  direction: number; // -1 = going back, 1 = going forward
+  direction: number;
+  theme: Theme;
+  onThemeToggle: () => void;
 }
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -20,11 +24,14 @@ export default function CalendarHeader({
   onNext,
   onToday,
   direction,
+  theme,
+  onThemeToggle,
 }: CalendarHeaderProps) {
   return (
     <div className="calendar-header">
-      {/* Top row: nav and month title */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+
+      {/* Top row */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 gap-2">
 
         {/* Prev button */}
         <motion.button
@@ -34,22 +41,22 @@ export default function CalendarHeader({
           className="nav-btn"
           aria-label="Previous month"
         >
-          <ChevronLeft size={16} strokeWidth={2.5} />
+          <ChevronLeft size={15} strokeWidth={2.5} />
         </motion.button>
 
-        {/* Month and Year */}
-        <div className="flex flex-col items-center gap-0.5 overflow-hidden">
+        {/* Month + Year */}
+        <div className="flex flex-col items-center flex-1 overflow-hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={format(currentDate, "yyyy-MM")}
-              initial={{ opacity: 0, y: direction > 0 ? 18 : -18 }}
+              initial={{ opacity: 0, y: direction > 0 ? 16 : -16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: direction > 0 ? -18 : 18 }}
+              exit={{ opacity: 0, y: direction > 0 ? -16 : 16 }}
               transition={{ duration: 0.22, ease: "easeInOut" }}
               className="flex flex-col items-center"
             >
               <span
-                className="text-2xl font-bold leading-tight tracking-wide uppercase"
+                className="text-xl font-bold leading-tight tracking-wide uppercase"
                 style={{
                   fontFamily: "var(--font-playfair)",
                   color: "var(--text-primary)",
@@ -59,10 +66,11 @@ export default function CalendarHeader({
                 {format(currentDate, "MMMM")}
               </span>
               <span
-                className="text-xs font-semibold tracking-widest"
+                className="text-xs font-semibold"
                 style={{
                   color: "var(--accent)",
                   letterSpacing: "0.18em",
+                  fontSize: "0.6rem",
                 }}
               >
                 {format(currentDate, "yyyy")}
@@ -71,20 +79,23 @@ export default function CalendarHeader({
           </AnimatePresence>
         </div>
 
-        {/* Next button */}
-        <motion.button
-          onClick={onNext}
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.93 }}
-          className="nav-btn"
-          aria-label="Next month"
-        >
-          <ChevronRight size={16} strokeWidth={2.5} />
-        </motion.button>
+        {/* Right side: theme switcher + next button */}
+        <div className="flex items-center gap-1.5">
+          <ThemeSwitcher theme={theme} onToggle={onThemeToggle} />
+          <motion.button
+            onClick={onNext}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.93 }}
+            className="nav-btn"
+            aria-label="Next month"
+          >
+            <ChevronRight size={15} strokeWidth={2.5} />
+          </motion.button>
+        </div>
       </div>
 
       {/* Today button */}
-      <div className="flex justify-center pb-3">
+      <div className="flex justify-center pb-2">
         <motion.button
           onClick={onToday}
           whileHover={{ scale: 1.04 }}
@@ -92,7 +103,7 @@ export default function CalendarHeader({
           className="today-btn flex items-center gap-1.5"
           aria-label="Go to today"
         >
-          <CalendarDays size={11} strokeWidth={2} />
+          <CalendarDays size={10} strokeWidth={2} />
           <span>Today</span>
         </motion.button>
       </div>
@@ -107,14 +118,14 @@ export default function CalendarHeader({
             key={day}
             className="text-center py-1"
             style={{
-              fontSize: "0.6875rem",
+              fontSize: "0.6rem",
               fontWeight: 600,
               letterSpacing: "0.08em",
+              textTransform: "uppercase",
               color:
                 day === "Sat" || day === "Sun"
                   ? "var(--accent)"
                   : "var(--text-secondary)",
-              textTransform: "uppercase",
             }}
           >
             {day}
