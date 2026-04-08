@@ -25,37 +25,37 @@ export function useDateRangeSelector(): UseDateRangeSelectorReturn {
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
-  // Are we in the middle of selecting (start chosen, end not yet)
+  // in the middle of selecting
   const isSelecting = range.start !== null && range.end === null;
 
   const onDayClick = useCallback(
     (date: Date) => {
       const clicked = startOfDay(date);
 
-      // Case 1: Nothing selected yet → set start
+      // Nothing selected -> set start
       if (!range.start && !range.end) {
         setRange({ start: clicked, end: null });
         return;
       }
 
-      // Case 2: Start selected, no end yet
+      // Start selected, not ended
       if (range.start && !range.end) {
-        // Clicking the same start date → clear
+        // clicked the same day -> clear
         if (isSameDay(clicked, range.start)) {
           setRange({ start: null, end: null });
           return;
         }
-        // Clicked before start → swap: new date becomes start
+        // Clicked before start -> swap
         if (isBefore(clicked, range.start)) {
           setRange({ start: clicked, end: range.start });
           return;
         }
-        // Normal case: set end
+        // set end
         setRange({ start: range.start, end: clicked });
         return;
       }
 
-      // Case 3: Full range already set → start fresh
+      // Full range already set -> start fresh
       setRange({ start: clicked, end: null });
     },
     [range]
@@ -74,13 +74,11 @@ export function useDateRangeSelector(): UseDateRangeSelectorReturn {
     setHoverDate(null);
   }, []);
 
-  // Effective end: while selecting, use hoverDate as preview end
   const effectiveEnd =
     isSelecting && hoverDate ? hoverDate : range.end;
 
   const effectiveStart = range.start;
 
-  // Normalize so start is always before end for interval checks
   const normalizedStart =
     effectiveStart && effectiveEnd
       ? isBefore(effectiveStart, effectiveEnd)
@@ -123,7 +121,6 @@ export function useDateRangeSelector(): UseDateRangeSelectorReturn {
     [normalizedStart, normalizedEnd]
   );
 
-  // Is this date the visual left edge of the range highlight
   const isRangeStartCap = useCallback(
     (date: Date) => {
       if (!normalizedStart || !normalizedEnd) return false;
@@ -133,7 +130,6 @@ export function useDateRangeSelector(): UseDateRangeSelectorReturn {
     [normalizedStart, normalizedEnd]
   );
 
-  // Is this date the visual right edge of the range highlight
   const isRangeEndCap = useCallback(
     (date: Date) => {
       if (!normalizedStart || !normalizedEnd) return false;

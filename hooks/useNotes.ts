@@ -4,8 +4,8 @@ import { DateRange } from "./useDateRangeSelector";
 
 export interface Note {
   id: string;
-  key: string;           // date string key e.g. "2024-01" or "2024-01-15:2024-01-20"
-  label: string;         // human-readable label e.g. "January 2024" or "Jan 15 → Jan 20"
+  key: string;           // "2024-01" or "2024-01-15:2024-01-20"
+  label: string;         // "January 2024" or "Jan 15 -> Jan 20"
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -40,7 +40,7 @@ export function useNotes(
   const [notes, setNotes] = useState<Record<string, Note>>({});
   const [hydrated, setHydrated] = useState(false);
 
-  // Load from localStorage on mount
+  // Load from localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -53,7 +53,7 @@ export function useNotes(
     setHydrated(true);
   }, []);
 
-  // Persist to localStorage whenever notes change (after hydration)
+  // Persist to localStorage when notes change
   useEffect(() => {
     if (!hydrated) return;
     try {
@@ -62,8 +62,6 @@ export function useNotes(
       console.warn("Failed to save notes to localStorage", e);
     }
   }, [notes, hydrated]);
-
-  // ── Key generators ───────────────────────────────────────────
 
   const getMonthKey = useCallback((date: Date): string => {
     return format(date, "yyyy-MM");
@@ -77,19 +75,15 @@ export function useNotes(
   const activeMonthKey = getMonthKey(currentDate);
   const activeRangeKey = getRangeKey(range);
 
-  // ── Derived values for current context ───────────────────────
-
   const monthNote = notes[activeMonthKey]?.content ?? "";
   const rangeNote = activeRangeKey ? (notes[activeRangeKey]?.content ?? "") : "";
 
-  // ── CRUD ─────────────────────────────────────────────────────
-
+  // CRUD 
   const setMonthNote = useCallback(
     (content: string) => {
       setNotes((prev) => {
         const existing = prev[activeMonthKey];
         if (!content.trim()) {
-          // Remove note if empty
           const updated = { ...prev };
           delete updated[activeMonthKey];
           return updated;
