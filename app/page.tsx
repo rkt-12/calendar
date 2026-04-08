@@ -6,10 +6,12 @@ import { useDateRangeSelector } from "@/hooks/useDateRangeSelector";
 import { useNotes } from "@/hooks/useNotes";
 import CalendarHeader from "@/components/CalendarHeader";
 import CalendarGrid from "@/components/CalendarGrid";
+import HeroImagePanel from "@/components/HeroImagePanel";
 import { format } from "date-fns";
 
 export default function Home() {
   const [direction, setDirection] = useState(1);
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
 
   const {
     currentDate,
@@ -56,10 +58,47 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen flex items-center justify-center p-8"
+      className="min-h-screen flex items-center justify-center p-4 md:p-8"
       style={{ backgroundColor: "var(--bg)" }}
     >
-      <div className="calendar-card w-full max-w-sm">
+      {/* ── Desktop: side-by-side | Mobile: stacked ──── */}
+      <div
+        className="calendar-card w-full max-w-3xl flex flex-col md:flex-row"
+        style={{ minHeight: "520px" }}
+      >
+        {/* Left — Hero image (desktop) / Top banner (mobile) */}
+        <div
+          className="md:w-2/5 w-full"
+          style={{ position: "relative", flexShrink: 0 }}
+        >
+          {/* Mobile: banner variant */}
+          <div className="block md:hidden">
+            <HeroImagePanel
+              currentDate={currentDate}
+              customImageUrl={customImageUrl}
+              onImageUpload={setCustomImageUrl}
+              variant="banner"
+            />
+          </div>
+          {/* Desktop: full-height hero variant */}
+          <div
+            className="hidden md:block"
+            style={{ height: "100%", minHeight: "520px" }}
+          >
+            <HeroImagePanel
+              currentDate={currentDate}
+              customImageUrl={customImageUrl}
+              onImageUpload={setCustomImageUrl}
+              variant="hero"
+            />
+          </div>
+        </div>
+
+        {/* Right — Calendar panel */}
+        <div
+          className="flex-1 flex flex-col overflow-hidden"
+          style={{ borderLeft: "1px solid var(--border)" }}
+        >
 
         {/* Header */}
         <CalendarHeader
@@ -196,6 +235,7 @@ export default function Home() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </main>
   );
