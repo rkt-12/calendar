@@ -51,7 +51,7 @@ export default function HeroImagePanel({
         flexShrink: 0,
       }}
     >
-      {/* ── Background Image ─────────────────────────────── */}
+      {/* Background Image  */}
       <AnimatePresence mode="wait">
         <motion.div
           key={`${monthIndex}-${imageUrl}`}
@@ -84,7 +84,7 @@ export default function HeroImagePanel({
         </motion.div>
       </AnimatePresence>
 
-      {/* ── Dark overlay for text readability ────────────── */}
+      {/* Dark overlay for text readability */}
       <div
         style={{
           position: "absolute",
@@ -95,7 +95,7 @@ export default function HeroImagePanel({
         }}
       />
 
-      {/* ── Blue Chevron SVG overlay ──────────────────────── */}
+      {/* Blue Chevron SVG overlay */}
       <div
         style={{
           position: "absolute",
@@ -129,7 +129,7 @@ export default function HeroImagePanel({
         </svg>
       </div>
 
-      {/* ── Month + Year label ────────────────────────────── */}
+      {/* Month + Year label */}
       <div
         style={{
           position: "absolute",
@@ -173,7 +173,7 @@ export default function HeroImagePanel({
         </motion.div>
       </div>
 
-      {/* ── Upload button ─────────────────────────────────── */}
+      {/* Upload button */}
       <motion.button
         style={{
           position: "absolute",
