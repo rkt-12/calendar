@@ -5,8 +5,8 @@ import { useCalendar } from "@/hooks/useCalendar";
 import { useDateRangeSelector } from "@/hooks/useDateRangeSelector";
 import { useNotes } from "@/hooks/useNotes";
 import CalendarHeader from "@/components/CalendarHeader";
+import CalendarGrid from "@/components/CalendarGrid";
 import { format } from "date-fns";
-import clsx from "clsx";
 
 export default function Home() {
   const [direction, setDirection] = useState(1);
@@ -61,6 +61,7 @@ export default function Home() {
     >
       <div className="calendar-card w-full max-w-sm">
 
+        {/* Header */}
         <CalendarHeader
           currentDate={currentDate}
           onPrev={handlePrev}
@@ -69,46 +70,34 @@ export default function Home() {
           direction={direction}
         />
 
-        {/* Day grid */}
-        <div className="px-3 pt-3">
-          <div className="grid grid-cols-7" onMouseLeave={onDayLeave}>
-            {calendarDays.map((day, i) => (
-              <div
-                key={i}
-                onClick={() => day.isCurrentMonth && onDayClick(day.date)}
-                onMouseEnter={() =>
-                  day.isCurrentMonth && onDayHover(day.date)
-                }
-                className={clsx(
-                  "day-cell aspect-square text-xs",
-                  !day.isCurrentMonth && "day-cell--outside",
-                  day.isToday && "day-cell--today",
-                  day.isWeekend &&
-                    day.isCurrentMonth &&
-                    "day-cell--weekend",
-                  isInRange(day.date) && "day-cell--in-range",
-                  isRangeStartCap(day.date) &&
-                    "day-cell--range-start-cap",
-                  isRangeEndCap(day.date) && "day-cell--range-end-cap",
-                  isStart(day.date) && "day-cell--start",
-                  isEnd(day.date) && "day-cell--end"
-                )}
-              >
-                {format(day.date, "d")}
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Grid */}
+        <CalendarGrid
+          calendarDays={calendarDays}
+          currentDate={currentDate}
+          direction={direction}
+          isStart={isStart}
+          isEnd={isEnd}
+          isInRange={isInRange}
+          isRangeStartCap={isRangeStartCap}
+          isRangeEndCap={isRangeEndCap}
+          onDayClick={onDayClick}
+          onDayHover={onDayHover}
+          onDayLeave={onDayLeave}
+        />
 
-        {/* Notes section */}
+        {/* Notes */}
         <div
-          className="px-4 py-4 mt-2 space-y-3"
+          className="px-4 py-4 space-y-3"
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <div>
             <label
-              className="text-xs font-semibold mb-1 block uppercase tracking-widest"
-              style={{ color: "var(--text-secondary)", fontSize: "0.6rem" }}
+              className="block mb-1 uppercase tracking-widest"
+              style={{
+                fontSize: "0.6rem",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
+              }}
             >
               Month note
             </label>
@@ -124,8 +113,12 @@ export default function Home() {
           {range.start && range.end && (
             <div>
               <label
-                className="text-xs font-semibold mb-1 block uppercase tracking-widest"
-                style={{ color: "var(--accent)", fontSize: "0.6rem" }}
+                className="block mb-1 uppercase tracking-widest"
+                style={{
+                  fontSize: "0.6rem",
+                  fontWeight: 600,
+                  color: "var(--accent)",
+                }}
               >
                 {format(range.start, "MMM d")} →{" "}
                 {format(range.end, "MMM d")}
@@ -148,10 +141,7 @@ export default function Home() {
           )}
 
           {isSelecting && (
-            <p
-              className="text-xs"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
               From {format(range.start!, "MMM d")} — pick an end date
             </p>
           )}
@@ -164,8 +154,12 @@ export default function Home() {
             style={{ borderTop: "1px solid var(--border)" }}
           >
             <p
-              className="text-xs font-semibold uppercase tracking-widest pt-3"
-              style={{ color: "var(--text-secondary)", fontSize: "0.6rem" }}
+              className="uppercase tracking-widest pt-3"
+              style={{
+                fontSize: "0.6rem",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
+              }}
             >
               Saved notes
             </p>
@@ -192,8 +186,8 @@ export default function Home() {
                   </div>
                   <button
                     onClick={() => deleteNote(note.key)}
+                    className="text-xs shrink-0 transition-colors"
                     style={{ color: "var(--text-muted)" }}
-                    className="text-xs shrink-0 hover:text-red-400 transition-colors"
                   >
                     ✕
                   </button>
