@@ -3,6 +3,12 @@
 An interactive wall calendar built with **Next.js**,
 **Tailwind CSS**, and **Framer Motion**.
 
+# Live link: 
+https://calendar-steel-chi.vercel.app/
+
+# Loom Demo
+https://www.loom.com/share/5a2472ae36bf4bf3aa226bec42ec4e2c
+
 ## Features
 
 | Feature | Details |
