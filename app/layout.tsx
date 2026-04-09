@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -19,8 +19,16 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Wall Calendar",
-  description: "Interactive wall calendar component",
+  title: "Wall Calendar — Interactive Date Picker",
+  description:
+    "A polished interactive wall calendar with date range selection, notes, light/dark mode, and holiday markers.",
+  keywords: ["calendar", "date picker", "react", "nextjs", "interactive"],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -31,19 +39,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Inline script to apply theme BEFORE paint — prevents flash */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  var stored = localStorage.getItem('calendar-theme');
-                  if (stored === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  } else if (stored === 'light') {
-                    document.documentElement.setAttribute('data-theme', 'light');
+                  var s = localStorage.getItem('calendar-theme');
+                  if (s === 'dark' || s === 'light') {
+                    document.documentElement.setAttribute('data-theme', s);
                   } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
                   }
                 } catch(e) {}
               })();

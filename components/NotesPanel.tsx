@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import { X, StickyNote, CalendarRange } from "lucide-react";
+import { X, StickyNote, CalendarRange, Clock } from "lucide-react";
 import { DateRange } from "@/hooks/useDateRangeSelector";
+import { getRangeDuration, getRangeDurationColor } from "@/utils/dateUtils";
 
 interface NotesPanelProps {
   currentDate: Date;
@@ -32,18 +33,18 @@ export default function NotesPanel({
   const monthCharsLeft = MAX_CHARS - monthNote.length;
   const rangeCharsLeft = MAX_CHARS - rangeNote.length;
 
+  const duration =
+    hasRange ? getRangeDuration(range.start!, range.end!) : null;
+  const durationColor =
+    hasRange ? getRangeDurationColor(range.start!, range.end!) : null;
+
   return (
     <div className="notes-panel px-4 py-4 space-y-4">
 
-      {/* Month Note */}
       <div>
-        {/* Label row */}
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
-            <StickyNote
-              size={11}
-              style={{ color: "var(--text-secondary)" }}
-            />
+            <StickyNote size={11} style={{ color: "var(--text-secondary)" }} />
             <span
               className="uppercase tracking-widest"
               style={{
@@ -55,22 +56,16 @@ export default function NotesPanel({
               {format(currentDate, "MMMM yyyy")}
             </span>
           </div>
-          {/* Char counter */}
           <span
             style={{
               fontSize: "0.6rem",
-              color:
-                monthCharsLeft < 30
-                  ? "var(--accent)"
-                  : "var(--text-muted)",
+              color: monthCharsLeft < 30 ? "var(--accent)" : "var(--text-muted)",
               transition: "color 0.2s ease",
             }}
           >
             {monthNote.length > 0 && `${monthCharsLeft}`}
           </span>
         </div>
-
-        {/* Textarea */}
         <textarea
           className="notes-textarea"
           rows={2}
@@ -95,21 +90,14 @@ export default function NotesPanel({
               className="flex items-center gap-2 px-3 py-2 rounded-lg"
               style={{
                 background: "var(--accent-light)",
-                border: "1px solid var(--accent)",
-                borderStyle: "dashed",
+                border: "1px dashed var(--accent)",
               }}
             >
               <CalendarRange
                 size={12}
                 style={{ color: "var(--accent)", flexShrink: 0 }}
               />
-              <span
-                style={{
-                  fontSize: "0.7rem",
-                  color: "var(--accent)",
-                  fontWeight: 500,
-                }}
-              >
+              <span style={{ fontSize: "0.7rem", color: "var(--accent)", fontWeight: 500 }}>
                 From {format(range.start!, "MMM d")} — now pick an end date
               </span>
             </div>
@@ -126,19 +114,18 @@ export default function NotesPanel({
             exit={{ opacity: 0, y: -6, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
           >
-            {/* Range badge */}
-            <div className="flex items-center justify-between mb-1.5">
+            {/* Range badge row */}
+            <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+              {/* Date range label */}
               <div
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
                 style={{
                   background: "var(--accent-light)",
                   border: "1px solid var(--accent)",
+                  flexShrink: 0,
                 }}
               >
-                <CalendarRange
-                  size={10}
-                  style={{ color: "var(--accent)" }}
-                />
+                <CalendarRange size={10} style={{ color: "var(--accent)" }} />
                 <span
                   style={{
                     fontSize: "0.6rem",
@@ -153,15 +140,41 @@ export default function NotesPanel({
                 </span>
               </div>
 
+              {/* Duration badge */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={duration ?? "none"}
+                  initial={{ opacity: 0, scale: 0.75, y: 4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.75 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full"
+                  style={{
+                    background: `${durationColor}18`,
+                    border: `1px solid ${durationColor}55`,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Clock size={9} style={{ color: durationColor ?? undefined }} />
+                  <span
+                    style={{
+                      fontSize: "0.6rem",
+                      fontWeight: 700,
+                      color: durationColor ?? undefined,
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {duration}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+
               {/* Char counter + clear */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-auto">
                 <span
                   style={{
                     fontSize: "0.6rem",
-                    color:
-                      rangeCharsLeft < 30
-                        ? "var(--accent)"
-                        : "var(--text-muted)",
+                    color: rangeCharsLeft < 30 ? "var(--accent)" : "var(--text-muted)",
                   }}
                 >
                   {rangeNote.length > 0 && `${rangeCharsLeft}`}

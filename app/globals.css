@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Light Theme (default)  */
+/* Light Theme  */
 :root {
   --bg: #faf9f7;
   --surface: #ffffff;
@@ -17,10 +17,10 @@
   --range-fill: #dbeafe;
   --range-fill-text: #1e40af;
   --today-ring: #1e6fe0;
-  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 20px 60px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.06);
 }
 
-/* Dark Theme  */
+/* Dark Theme */
 [data-theme="dark"] {
   --bg: #0d0d0d;
   --surface: #161616;
@@ -37,21 +37,18 @@
   --range-fill: #162440;
   --range-fill-text: #93c5fd;
   --today-ring: #4a9eff;
-  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 20px 60px rgba(0,0,0,0.55), 0 8px 24px rgba(0,0,0,0.3);
 }
 
-/* Base  */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* Base reset */
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
   background-color: var(--bg);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -62,17 +59,68 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Calendar Card  */
+/* Focus ring keyboard nav */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Calendar card */
 .calendar-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Day Cell States  */
+/* Nav buttons */
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-btn:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Today button */
+.today-btn {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.today-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Day cell */
 .day-cell {
   position: relative;
   display: flex;
@@ -80,13 +128,16 @@ body {
   justify-content: center;
   cursor: pointer;
   border-radius: 8px;
-  transition: background 0.15s ease, color 0.15s ease;
   font-family: var(--font-dm-sans), sans-serif;
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   font-weight: 400;
   color: var(--text-primary);
   user-select: none;
-  min-height: 36px;
+  min-height: 34px;
+  min-width: 0;
+  transition: background 0.12s ease, color 0.12s ease;
+  /* Touch-friendly tap target */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .day-cell:hover:not(.day-cell--outside):not(.day-cell--start):not(.day-cell--end) {
@@ -105,13 +156,8 @@ body {
   border-radius: 0;
 }
 
-.day-cell--range-start-cap {
-  border-radius: 8px 0 0 8px;
-}
-
-.day-cell--range-end-cap {
-  border-radius: 0 8px 8px 0;
-}
+.day-cell--range-start-cap { border-radius: 8px 0 0 8px; }
+.day-cell--range-end-cap   { border-radius: 0 8px 8px 0; }
 
 .day-cell--start,
 .day-cell--end {
@@ -122,55 +168,61 @@ body {
   z-index: 1;
 }
 
-.day-cell--weekend {
+.day-cell--weekend:not(.day-cell--start):not(.day-cell--end) {
   color: var(--accent);
 }
 
-.day-cell--weekend.day-cell--outside {
-  color: var(--text-muted);
-}
+.day-cell--weekend.day-cell--outside { color: var(--text-muted); }
 
+/* Today dot */
 .day-cell--today::after {
   content: "";
   position: absolute;
   bottom: 3px;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: var(--today-ring);
 }
 
 .day-cell--start.day-cell--today::after,
 .day-cell--end.day-cell--today::after {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255,255,255,0.75);
 }
 
+/* Holiday dot — top-right */
 .day-cell--holiday::before {
   content: "";
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 4px;
-  height: 4px;
+  top: 3px;
+  right: 3px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: #ef4444;
 }
 
+.day-cell--start.day-cell--holiday::before,
+.day-cell--end.day-cell--holiday::before {
+  background: rgba(255,255,255,0.7);
+}
+
+/* Notes textarea */
 .notes-textarea {
   width: 100%;
   resize: none;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   font-family: var(--font-dm-sans), sans-serif;
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   color: var(--text-primary);
   line-height: 1.6;
-  transition: border-color 0.2s ease, background 0.3s ease, box-shadow 0.2s ease;
   outline: none;
+  transition: border-color 0.2s ease, background 0.3s ease, box-shadow 0.2s ease;
 }
 
 .notes-textarea:focus {
@@ -178,58 +230,31 @@ body {
   box-shadow: 0 0 0 3px var(--accent-light);
 }
 
-.notes-textarea::placeholder {
-  color: var(--text-muted);
-}
+.notes-textarea::placeholder { color: var(--text-muted); }
 
-::-webkit-scrollbar { width: 4px; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-.theme-transitioning * {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+@media (max-width: 767px) {
+  .day-cell {
+    min-height: 38px;
+    font-size: 0.75rem;
+  }
+
+  .calendar-card {
+    border-radius: 16px;
+  }
 }
 
-.nav-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.nav-btn:hover {
-  background: var(--accent-light);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.today-btn {
-  font-family: var(--font-dm-sans), sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 4px 12px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.today-btn:hover {
-  background: var(--accent-light);
-  color: var(--accent);
-  border-color: var(--accent);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

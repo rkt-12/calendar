@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calendar 
 
-## Getting Started
+An interactive wall calendar built with **Next.js**,
+**Tailwind CSS**, and **Framer Motion**.
 
-First, run the development server:
+## Features
+
+| Feature | Details |
+|---|---|
+| 🖼 Wall Calendar Aesthetic | Hero image panel + blue geometric chevron overlay |
+| 📅 Day Range Selector | Click start & end with live hover preview |
+| 📝 Notes Panel | Month notes + range-specific notes, auto-saved |
+| 🌙 Light / Dark Mode | OS-aware, zero flash on reload, persisted |
+| 🎉 Holiday Markers | Indian national + international days with red dot |
+| 🖼 Custom Image Upload | Replace hero with your own photo |
+| ✨ Framer Motion | Month slide transitions + staggered day entry |
+| 📱 Fully Responsive | Two-panel desktop, stacked mobile |
+| ♿ Accessible | ARIA labels, keyboard nav, focus rings, reduced motion |
+| 💾 localStorage | Notes and theme persist across sessions |
+
+## 🚀 Getting Started
 
 ```bash
+git clone https://github.com/rkt-12/calendar.git
+cd calendar
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏗 Architecture
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+/app
+  layout.tsx              ← fonts, zero-flash theme script
+  page.tsx                ← root page, composes all hooks + components
+  globals.css             ← CSS variables (light + dark), base styles
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+/components
+  CalendarHeader.tsx      ← month nav, weekday labels, theme toggle
+  CalendarGrid.tsx        ← animated 7×6 grid with month transitions
+  DayCell.tsx             ← single day with all visual states + keyboard
+  HeroImagePanel.tsx      ← hero image, chevron SVG, image upload
+  NotesPanel.tsx          ← month + range note editing with char counter
+  NotesList.tsx           ← saved notes history, expand/collapse, delete
+  ThemeSwitcher.tsx       ← animated sun/moon toggle button
 
-## Learn More
+/hooks
+  useCalendar.ts          ← month state, 42-cell grid generation
+  useDateRangeSelector.ts ← range selection, hover preview, helpers
+  useNotes.ts             ← CRUD notes, localStorage persistence
+  useTheme.ts             ← light/dark toggle, OS preference, persistence
 
-To learn more about Next.js, take a look at the following resources:
+/data
+  holidays.ts             ← Indian + international holiday map
+  monthImages.ts          ← curated Unsplash photo per month
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Design Decisions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Playfair Display + DM Sans** — editorial serif paired with clean sans-serif
+- **CSS variables** — all colors in `:root` and `[data-theme="dark"]`, zero per-component dark mode changes needed
+- **Zero flash** — inline `<script>` in `<head>` reads localStorage before first paint
+- **date-fns** — lightweight, tree-shakeable, TypeScript-native date math
+- **Week starts Monday** — matches the reference image and international standard
+- **Framer Motion AnimatePresence** — month transitions slide directionally
 
-## Deploy on Vercel
+## 📱 Responsive Breakpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Breakpoint | Layout |
+|---|---|
+| `< 768px` | Stacked — banner image top, calendar below |
+| `≥ 768px` | Side by side — hero image left (40%), calendar right (60%) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ♿ Accessibility
+
+- All interactive elements have `aria-label`
+- Full keyboard navigation — Tab to focus days, Enter/Space to select
+- `:focus-visible` ring on all focusable elements
+- `role="grid"` on calendar, `role="button"` on day cells
+- `@media (prefers-reduced-motion)` disables all animations
+- `aria-hidden` on decorative hero image panel

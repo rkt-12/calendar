@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useCalendar } from "@/hooks/useCalendar";
 import { useDateRangeSelector } from "@/hooks/useDateRangeSelector";
-import { useNotes } from "@/hooks/useNotes";
+import { useNotes, Note } from "@/hooks/useNotes";
 import { useTheme } from "@/hooks/useTheme";
 import CalendarHeader from "@/components/CalendarHeader";
 import CalendarGrid from "@/components/CalendarGrid";
 import HeroImagePanel from "@/components/HeroImagePanel";
 import NotesPanel from "@/components/NotesPanel";
 import NotesList from "@/components/NotesList";
-import { Note } from "@/hooks/useNotes";
 import { parse } from "date-fns";
 
 export default function Home() {
@@ -52,48 +51,59 @@ export default function Home() {
 
   const allNotes = getAllNotes();
 
-  function handlePrev() {
+  const handlePrev = useCallback(() => {
     setDirection(-1);
     goToPrevMonth();
-  }
+  }, [goToPrevMonth]);
 
-  function handleNext() {
+  const handleNext = useCallback(() => {
     setDirection(1);
     goToNextMonth();
-  }
+  }, [goToNextMonth]);
 
-  function handleNoteClick(note: Note) {
-    if (note.rangeStart) {
+  // Navigate calendar to the month of a clicked saved note
+  const handleNoteClick = useCallback(
+    (note: Note) => {
+      if (!note.rangeStart) return;
       const target = parse(note.rangeStart, "yyyy-MM-dd", new Date());
-      const diff =
-        target.getFullYear() * 12 +
-        target.getMonth() -
-        (currentDate.getFullYear() * 12 + currentDate.getMonth());
+      const currentMonths =
+        currentDate.getFullYear() * 12 + currentDate.getMonth();
+      const targetMonths =
+        target.getFullYear() * 12 + target.getMonth();
+      const diff = targetMonths - currentMonths;
+
+      if (diff === 0) return;
+
       if (diff > 0) {
-        for (let i = 0; i < diff; i++) {
-          setDirection(1);
-          goToNextMonth();
-        }
-      } else if (diff < 0) {
-        for (let i = 0; i < Math.abs(diff); i++) {
-          setDirection(-1);
-          goToPrevMonth();
-        }
+        setDirection(1);
+        for (let i = 0; i < diff; i++) goToNextMonth();
+      } else {
+        setDirection(-1);
+        for (let i = 0; i < Math.abs(diff); i++) goToPrevMonth();
       }
-    }
-  }
+    },
+    [currentDate, goToNextMonth, goToPrevMonth]
+  );
 
   return (
     <main
       className="min-h-screen flex items-center justify-center p-4 md:p-8"
       style={{ backgroundColor: "var(--bg)" }}
+      aria-label="Wall Calendar Application"
     >
       <div
         className="calendar-card w-full max-w-3xl flex flex-col md:flex-row"
         style={{ minHeight: "560px" }}
+        role="application"
+        aria-label="Interactive Wall Calendar"
       >
-        {/* Image */}
-        <div className="md:w-2/5 w-full" style={{ flexShrink: 0 }}>
+        {/* Image Panel */}
+        <div
+          className="md:w-2/5 w-full"
+          style={{ flexShrink: 0 }}
+          aria-hidden="true"
+        >
+          {/* Mobile banner */}
           <div className="block md:hidden">
             <HeroImagePanel
               currentDate={currentDate}
@@ -102,6 +112,7 @@ export default function Home() {
               variant="banner"
             />
           </div>
+          {/* Desktop full hero */}
           <div
             className="hidden md:block"
             style={{ height: "100%", minHeight: "560px" }}
@@ -115,12 +126,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Calendar + Notes */}
+        {/* Calendar + Notes Panel */}
         <div
           className="flex-1 flex flex-col overflow-hidden"
           style={{ borderLeft: "1px solid var(--border)" }}
         >
-          {/* Header and theme switcher */}
           <CalendarHeader
             currentDate={currentDate}
             onPrev={handlePrev}
@@ -160,7 +170,6 @@ export default function Home() {
             />
           </div>
 
-          {/* Saved notes */}
           <NotesList
             notes={allNotes}
             onDelete={deleteNote}
